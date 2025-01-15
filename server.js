@@ -5,8 +5,7 @@ const jwt = require("jsonwebtoken");
 const app = express();
 app.use(bodyParser.json());
 
-// Mock database em memória
-let userProfits = {};
+let userProfits = {}; // Mock database em memória
 
 // Middleware para autenticação
 function authenticate(req, res, next) {
@@ -42,13 +41,5 @@ app.put("/api/profit/:planId", authenticate, (req, res) => {
     res.send("Atualizado com sucesso");
 });
 
-// Teste simples para verificar se o servidor está rodando
-app.get("/", (req, res) => {
-    res.send("Servidor rodando com sucesso!");
-});
-
 // Inicia o servidor
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-});
+app.listen(10000, () => console.log("Servidor rodando na porta 10000"));
