@@ -1,22 +1,45 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(bodyParser.json());
 
-app.use(cors());
-app.use(express.json());
+let userProfits = {}; // Mock database em memória
 
-// Endpoint para salvar o lucro
-app.post('/save-profit', (req, res) => {
-    const { planId, profit, timestamp } = req.body;
-    console.log(`Lucro do plano ${planId}: ${profit}$, Timestamp: ${timestamp}`);
+// Middleware para autenticação
+function authenticate(req, res, next) {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).send("Token não fornecido");
 
-    // Aqui você pode integrar com seu banco de dados para salvar os dados
+    try {
+        const user = jwt.verify(token, "secreto");
+        req.user = user;
+        next();
+    } catch {
+        res.status(401).send("Token inválido");
+    }
+}
 
-    res.status(200).json({ message: 'Lucro salvo com sucesso!' });
+// Endpoint para buscar os ganhos
+app.get("/api/profit/:planId", authenticate, (req, res) => {
+    const userId = req.user.id;
+    const planId = req.params.planId;
+    const profit = userProfits[userId]?.[planId] || { profit: 0, updatedAt: Date.now() };
+    res.json(profit);
 });
 
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+// Endpoint para atualizar os ganhos
+app.put("/api/profit/:planId", authenticate, (req, res) => {
+    const userId = req.user.id;
+    const planId = req.params.planId;
+    const { profit, updatedAt } = req.body;
+
+    if (!userProfits[userId]) userProfits[userId] = {};
+    userProfits[userId][planId] = { profit, updatedAt };
+
+    res.send("Atualizado com sucesso");
 });
+
+// Inicia o servidor
+app.listen(3000, () => console.log("Servidor rodando na porta 3000"));
