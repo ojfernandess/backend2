@@ -3,9 +3,12 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 
 const app = express();
+
+// Middleware para processar o corpo das requisições
 app.use(bodyParser.json());
 
-let userProfits = {}; // Mock database em memória
+// Banco de dados simulado em memória (como um objeto)
+let userProfits = {}; 
 
 // Middleware para autenticação
 function authenticate(req, res, next) {
@@ -21,7 +24,7 @@ function authenticate(req, res, next) {
     }
 }
 
-// Endpoint para buscar os ganhos
+// Endpoint para buscar os ganhos (GET)
 app.get("/api/profit/:planId", authenticate, (req, res) => {
     const userId = req.user.id;
     const planId = req.params.planId;
@@ -29,7 +32,7 @@ app.get("/api/profit/:planId", authenticate, (req, res) => {
     res.json(profit);
 });
 
-// Endpoint para atualizar os ganhos
+// Endpoint para atualizar os ganhos (PUT)
 app.put("/api/profit/:planId", authenticate, (req, res) => {
     const userId = req.user.id;
     const planId = req.params.planId;
@@ -38,8 +41,21 @@ app.put("/api/profit/:planId", authenticate, (req, res) => {
     if (!userProfits[userId]) userProfits[userId] = {};
     userProfits[userId][planId] = { profit, updatedAt };
 
-    res.send("Atualizado com sucesso");
+    res.status(200).send("Ganhos atualizados com sucesso");
+});
+
+// Endpoint para criar ganhos (POST), caso necessário
+app.post("/api/profit/:planId", authenticate, (req, res) => {
+    const userId = req.user.id;
+    const planId = req.params.planId;
+    const { profit, updatedAt } = req.body;
+
+    if (!userProfits[userId]) userProfits[userId] = {};
+    userProfits[userId][planId] = { profit, updatedAt };
+
+    res.status(201).send("Ganhos criados com sucesso");
 });
 
 // Inicia o servidor
-app.listen(3000, () => console.log("Servidor rodando na porta 3000"));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
