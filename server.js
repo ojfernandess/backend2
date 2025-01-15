@@ -3,12 +3,10 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 
 const app = express();
-
-// Middleware para processar o corpo das requisições
 app.use(bodyParser.json());
 
-// Banco de dados simulado em memória (como um objeto)
-let userProfits = {}; 
+// Mock database em memória
+let userProfits = {};
 
 // Middleware para autenticação
 function authenticate(req, res, next) {
@@ -24,7 +22,7 @@ function authenticate(req, res, next) {
     }
 }
 
-// Endpoint para buscar os ganhos (GET)
+// Endpoint para buscar os ganhos
 app.get("/api/profit/:planId", authenticate, (req, res) => {
     const userId = req.user.id;
     const planId = req.params.planId;
@@ -32,7 +30,7 @@ app.get("/api/profit/:planId", authenticate, (req, res) => {
     res.json(profit);
 });
 
-// Endpoint para atualizar os ganhos (PUT)
+// Endpoint para atualizar os ganhos
 app.put("/api/profit/:planId", authenticate, (req, res) => {
     const userId = req.user.id;
     const planId = req.params.planId;
@@ -41,21 +39,16 @@ app.put("/api/profit/:planId", authenticate, (req, res) => {
     if (!userProfits[userId]) userProfits[userId] = {};
     userProfits[userId][planId] = { profit, updatedAt };
 
-    res.status(200).send("Ganhos atualizados com sucesso");
+    res.send("Atualizado com sucesso");
 });
 
-// Endpoint para criar ganhos (POST), caso necessário
-app.post("/api/profit/:planId", authenticate, (req, res) => {
-    const userId = req.user.id;
-    const planId = req.params.planId;
-    const { profit, updatedAt } = req.body;
-
-    if (!userProfits[userId]) userProfits[userId] = {};
-    userProfits[userId][planId] = { profit, updatedAt };
-
-    res.status(201).send("Ganhos criados com sucesso");
+// Teste simples para verificar se o servidor está rodando
+app.get("/", (req, res) => {
+    res.send("Servidor rodando com sucesso!");
 });
 
-// Inicia o servidor e usa a porta definida pelo ambiente ou 3000 se não definida
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+// Inicia o servidor
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
