@@ -56,6 +56,6 @@ app.post("/api/profit/:planId", authenticate, (req, res) => {
     res.status(201).send("Ganhos criados com sucesso");
 });
 
-// Inicia o servidor
-const PORT = process.env.PORT || 10000;
+// Inicia o servidor e usa a porta definida pelo ambiente ou 3000 se não definida
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
